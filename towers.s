@@ -17,43 +17,67 @@ startstring:
 
     .global	towers
 towers:
-   /* Save Registers */
+	push 	{r4, r5, r6, r7, r8, lr}	@ Save Registers
    
-   /* Save a copy of all 3 original parameters */
+						@ Save a copy of all 3 original parameters
+	mov	r4, r0				@ r4 <- numDisks (original)
+	mov	r5, r1				@ r5 <- start (original)
+	mov	r6, r2				@ r6 <- goal (original)
 
+						@ r7 <- pegs (temp)
+						@ r8 <- steps
+						
 if:
-   /* Compare numDisks with 2 or (numDisks - 2)*/
-   /* Check if less than, else branch to else */
-   
-   /* set start to start for printing */
-   /* set end to end for printing */
-   /* call print function */
-   /* Set return register to 1 */
-   /* branch to endif */
+	cmp 	r0, #2 				@ Compare numDisks with 2 or (numDisks - 2)
+
+	bge     else				@ Check if less than, else branch to else (if r0 >= 2, then go to else)   
+
+	mov     r0, r1				@ Set start to start for printing
+
+	mov     r1, r2				@ Set end to end for printing
+
+	bl      print				@ Call print function
+
+	mov     r0, #1  			@ Set return register to 1      
+			
+	b	endif				@ Branch to endif
 else:
-   /* Use a saved varable for temp and set it to 6 */
-   /* Subract start from temp and store to itself */
-   /* Subtract goal from temp and store to itself (temp = 6 - start - goal)*/
+        mov     r7, #6        			@ Use a saved variable for temp and set it to 6
 
-   /* subtract 1 from original numDisks and store it to numDisks parameter */
+        sub     r7, r7, r1			@ Subtract start from temp and store to itself   
+ 
+	sub	r7, r7, r2			@ Subtract goal from temp and store to itself (temp = 6 - start - goal)
 
-   /* Set end as temp */
-   /* Call towers function */
-   /* Save result to saved variable for total steps */
-   /* Set numDiscs to 1 */
-   /* Set start to original start */
-   /* Set goal to original goal */
-   /* Call towers function */
-   /* Add result to total steps so far */
+        sub     r0, r4, #1			@ Subtract 1 from original numDisks and store it to numDisks parameter
+
+	mov     r2, r7				@ Set end as temp
    
-   /* Set numDisks to original numDisks - 1 */
-   /* set start to temp */
-   /* set goal to original goal */
-   /* Call towers function */
-   /* Add result to total steps so far and save it to return register */
+	bl	towers				@ Call towers function
+   
+	mov	r8, r0				@ Save result to saved variable for total steps
+   
+	mov     r0, #1				@ Set numDiscs to 1
+   
+	mov	r1, r5 				@ Set start to original start
+   
+	mov     r2, r6				@ Set goal to original goal
+   
+	bl	towers				@ Call towers function
+   
+	add	r8, r8, r0			@ Add result to total steps so far
+   
+	sub	r0, r4, #1			@ Set numDisks to original numDisks - 1			
+
+	mov     r1, r7				@ Set start to temp
+   
+	mov	r2, r6				@ Set goal to original goal
+   
+	bl	towers				@ Call towers function
+   
+	add	r0, r8, r0			@ Add result to total steps so far and save it to return register
 
 endif:
-   /* Restore Registers */
+	pop	{r4, r5, r6, r7, r8, pc}	@ Restore registers
 
     .global	main
 main:
@@ -93,4 +117,4 @@ string2:
 	.space	1
 string3:
 	.ascii	"\012%d discs moved from peg %d to peg %d in %d steps."
-	.ascii	"s\012\000"
+	.ascii	"\012\000"
